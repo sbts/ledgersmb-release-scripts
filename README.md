@@ -2,13 +2,10 @@
 Tools to assist LedgerSMB developers release a new version
 
 ############
-##
-## A set of scripts and a library of functions to assist with releasing LedgerSMB
-##      Copyright (c) 20015 SB Tech Services info@sbts.com.au
-##
-## Exclusively Licensed for use in the LedgerSMB Project
-## Use in whole or part outside of the LedgerSMB Project is Not Permitted
-##
+#Copyright (c) 20015 SB Tech Services info@sbts.com.au
+
+Exclusively Licensed for use in the LedgerSMB Project
+Use in whole or part outside of the LedgerSMB Project is Not Permitted
 ############
 
 

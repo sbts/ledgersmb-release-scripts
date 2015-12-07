@@ -41,13 +41,15 @@ release-irc.sh
     Updates the IRC #ledgersmb TOPIC
     Requires 2 or 3 command line arguments
         * $1 = Type of Release:  stable | preview | both
-        * $2 = New version number:  if $1=stable or both then $2 is stable version number;  if $1=preview then $2 is preview version number
+        * $2 = New version number:
+                if $1=stable or both then $2 is stable version number;
+                if $1=preview then $2 is preview version number
         * $3 = New version number for preview IF $1 = both
 
     Two override arguments can be supplied (as the first 2 arguments).
     they are removed from the arg list before normal argument processing.
-          --aq true|false    # override AutoQuit config setting
-          --at true|false    # override auto_TOPIC_change config setting
+        *  --aq true|false    # override AutoQuit config setting
+        *  --at true|false    # override auto_TOPIC_change config setting
     These are intended mainly for testing rather than normal use.
 
 

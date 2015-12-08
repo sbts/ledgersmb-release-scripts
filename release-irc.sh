@@ -40,16 +40,13 @@ libFile=` readlink -f ./bash-functions.sh`
     printf "Exiting Now....\n\n\n";
     exit 1;
 }
-#safe_source release-lib.sh
+
 REQUIRE_bin "envsubst"
 
 i=0;
 while (( i++ < 30 )); do # check for --aq + --at. do it in a loop so order doesn't matter. break the loop at first non matching argument.
-#echo "LOOP $i"
     if [[ $1 == '--aq' ]]; then
-#echo "found --aq"
         if [[ $2 == 'true' ]] || [[ $2 == 'false' ]]; then
-#echo "found --aq argument"
             AutoQuitOverride=$2;
             shift;
         else
@@ -57,9 +54,7 @@ while (( i++ < 30 )); do # check for --aq + --at. do it in a loop so order doesn
         fi
         shift;
     elif [[ $1 == '--at' ]]; then
-#echo "found --at"
         if [[ $2 == 'true' ]] || [[ $2 == 'false' ]]; then
-#echo "found --at argument"
             AutoTopicOverride=$2;
             shift;
         else
@@ -168,7 +163,7 @@ send() {
 
 LOGON() {
     [[ -n ${cfgValue[irc_Password]} ]] && send "PASS ${cfgValue[irc_Password]}"
-    # no wipe the password for security. It's already been in memory for way to long. since we loaded the config!!!
+    # now wipe the password for security. It's already been in memory for way to long. since we loaded the config!!!
     cfgValue[irc_Password]="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"
     send "NICK $Nick"
     send "USER $Nick $uMode bot :$Name"
@@ -269,8 +264,6 @@ TALK() {
     HISTFILE=.irc.history
     shopt -s histappend
     set -o history
-#    shopt -o history
-#    shopt -s histappend
     until [[ ${Tx:-99} == QUIT ]]; do
         read -e Tx 2>&1
         history -s "$Tx"; # store in history array
@@ -353,11 +346,9 @@ changeTOPIC() { # $*=Current TOPIC    the regex to extract the two version numbe
         fi
     else # use the default template
         local _v='';
-        #printf ':-Enter Stable Version: ';
         read -p 'Enter Stable Version: ' _v 2>&1;
         : ${Version_Stable:=${_v:-$RANDOM}};   # set a temporary default
         _v='';
-        #printf ':-Enter Preview Version: ';
         read -p 'Enter Preview Version: ' _v 2>&1;
         : ${Version_Preview:=${_v:-$RANDOM}};  # set a temporary default
         _TOPIC="$(envsubst '$Version_Stable:$Version_Preview' <<<$TOPIC_template)"
@@ -464,8 +455,8 @@ exec 2>/tmp/irc.tcpconnection.log
 echo "**==** CONNECTING to SERVER $Server:$Port"
 echo "         this can take >2minutes to timeout if it fails."
 exec 3<> /dev/tcp/$Server/$Port
-#exec 3<> /dev/tcp/192.168.1.11/66677 # test a connection failure
 _Result=$? # store the result so we can test it and report it in the error window
+
 if (( $_Result != 0 )); then
     cat <<-EOF  | tee -a "$Log";
 	    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

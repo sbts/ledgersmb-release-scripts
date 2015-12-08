@@ -52,6 +52,9 @@ release-irc.sh
         *  --at true|false    # override auto_TOPIC_change config setting
     These are intended mainly for testing rather than normal use.
 
+    Readline support is enabled for user input, including history
+    By default history is in /tmp/irc.history
+    This can be changed in the config file (~/.lsmb-release)
 
 ============================
 release-sourceforge.sh

@@ -251,23 +251,24 @@ QUIT() {
 }
 
 EnableHistory() { # Requires $1 to be a history filename
-
+    HISTFILE=.irc.history
+    shopt -s histappend
+    set -o history
 }
-AddHistory() { # requires $1 to be line to add to history
 
+AddHistory() { # requires $1 to be line to add to history
+        history -s "$@"; # store in history array
+        history -a; #history -n; # append to history file, then reread any new entries # the reread may not be required.
 }
 
 TALK() {
     local _RequiresNick='WHO';
     local _RequiresChannel='TOPIC';
     local _TOPIC_current='';
-    HISTFILE=.irc.history
-    shopt -s histappend
-    set -o history
+    EnableHistory;
     until [[ ${Tx:-99} == QUIT ]]; do
         read -e Tx 2>&1
-        history -s "$Tx"; # store in history array
-        history -a; #history -n; # append to history file, then reread any new entries # the reread may not be required.
+        AddHistory "$Tx";
         if [[ ${Tx:0:1} == '/' ]]; then
             if (( ${#Tx} == 2 )); then
                 case ${Tx:1:1} in

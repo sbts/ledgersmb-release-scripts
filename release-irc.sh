@@ -88,6 +88,7 @@ done
         TestConfig4Key 'irc' 'Log'                '/tmp/irc.log'
         TestConfig4Key 'irc' 'LogOverwrite'       'true'
         TestConfig4Key 'irc' 'AutoQuit'           'true'
+        TestConfig4Key 'irc' 'ReadlineHistory'    '/tmp/irc.history'
         if TestConfigAsk "IRC Topic Update"; then break; fi
     done
 
@@ -108,8 +109,8 @@ TOPIC_regex_preview="${cfgValue[irc_TOPIC_regex_preview]}";
            NickServ="${cfgValue[irc_NickServ]}";
                 Log="${cfgValue[irc_Log]}";
        LogOverwrite="${cfgValue[irc_LogOverwrite]}";
-           auto_Quit="${cfgValue[irc_AutoQuit]}";
-
+          auto_Quit="${cfgValue[irc_AutoQuit]}";
+        historyFile="${cfgValue[irc_ReadlineHistory]}";
 
 unset Version_Stable;
 unset Version_Preview;
@@ -251,7 +252,7 @@ QUIT() {
 }
 
 EnableHistory() { # Requires $1 to be a history filename
-    HISTFILE=.irc.history
+    HISTFILE="$1"
     shopt -s histappend
     set -o history
 }
@@ -265,7 +266,7 @@ TALK() {
     local _RequiresNick='WHO';
     local _RequiresChannel='TOPIC';
     local _TOPIC_current='';
-    EnableHistory;
+    EnableHistory "$historyFile";
     until [[ ${Tx:-99} == QUIT ]]; do
         read -e Tx 2>&1
         AddHistory "$Tx";

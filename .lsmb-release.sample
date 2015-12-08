@@ -46,3 +46,5 @@ Log                 = /tmp/irc.log
 LogOverwrite        = true
                       # Auto Quit once topic changed.
 AutoQuit            = true
+                      # file to store readline history for user input
+ReadlineHistory     = /tmp/irc.history

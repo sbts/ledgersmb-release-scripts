@@ -118,9 +118,14 @@ updateIRC() {
     release-irc.sh $release_type $release_version
 }
 
+updateSourceforge() {  # note release-sourceforge.sh silently exits if $release_type != stable .   Anything else doesn't make sense.
+    release-sourceforge.sh "$release_type" "$release_version"
+}
+
 RunAllUpdates() {
     updateWikipedia "$release_version" "$release_date";
     updateIRC;
+    updateSourceforge;
     sendEmail;
 }
 
@@ -164,7 +169,7 @@ ValidateEnvironment() {
         while true; do
             TestConfigInit;
             TestConfig4Key 'sourceforge' 'ApiKey'   ''
-            TestConfig4Key 'sourceforge' 'Project'  'ledgersmb'
+            TestConfig4Key 'sourceforge' 'Project'  'ledger-smb'
             if TestConfigAsk "Sourceforge Default Download Update"; then break; fi
         done
 
@@ -196,6 +201,7 @@ main() {
 	    |                                                         | |
 	    |   *  Update Version on Wikipedia (en)                   | |
 	    |   *  Update IRC Title                                   | |
+	    |   *  Update Sourceforge Download Link                   | |
 	    |   *  Send Release Emails to                             | |
 	    |           *  $(printf "%-43s" "${cfgValue[mail_AnnounceList]}";)| |
 	    |           *  $(printf "%-43s" "${cfgValue[mail_UsersList]}";)| |
@@ -203,8 +209,6 @@ main() {
 	    |                                                         | |
 	    |   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    | |
 	    |      The following are not yet complete                 | |
-	    |                                                         | |
-	    |   *  Update Sourceforge Download Link                   | |
 	    |                                                         | |
 	    |   *  Post to $(printf "%-43s" "${cfgValue[drupal_URL]}";)| |
 	    |      Don't forget to use the 'release'                  | |

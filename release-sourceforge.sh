@@ -1,11 +1,40 @@
 #!/bin/bash
 
-#ehuelsmann: did you have a chance to look at the printer config demo?
-#http://tombuntu.com/index.php/2008/10/21/sending-email-from-your-system-with-ssmtp/
-
 # import some functions that we need, like reading values from our config file.
-#[ -f release-lib.sh ] && . release-lib.sh;
 ConfigFile=~/.lsmb-release
+
+# set DEBUG=true to get dump of returned JSON for each command
+DEBUG=true;
+
+############
+#  Check our arguments are sane
+############
+    if ! [[ ${1:-unknown} == 'stable' ]]; then
+        printf "\n\n\n";
+        printf "=====================================================================\n";
+        printf "=====================================================================\n";
+        printf "====  \$1 = %-10s                                            ====\n" "$1";
+        printf "====      We can only make changes to the default link           ====\n";
+        printf "====      when \$1 = stable                                       ====\n";
+        printf "=====================================================================\n";
+        printf "=====================================================================\n";
+        printf "Exiting Now....\n\n\n";
+        exit 1;
+    fi
+    if [[ -z $2 ]] && [[ -z $release_version ]]; then
+        printf "\n\n\n";
+        printf "=====================================================================\n";
+        printf "=====================================================================\n";
+        printf "====  Essential Argument not available:                          ====\n";
+        printf "====      One of the following must be set                       ====\n";
+        printf "====          \$release_version = %-10s                      ====\n" "$release_version";
+        printf "====                        \$2 = %-10s                      ====\n" "$2";
+        printf "=====================================================================\n";
+        printf "=====================================================================\n";
+        printf "Exiting Now....\n\n\n";
+        exit 1;
+    fi
+
 
 libFile=` readlink -f ./bash-functions.sh`
 [[ -f $libFile ]] && { [[ -r $libFile ]] && source $libFile; } || {
@@ -20,89 +49,143 @@ libFile=` readlink -f ./bash-functions.sh`
     exit 1;
 }
 
-#safe_source ./release-lib.sh
+#REQUIRE_bin "envsubst"
+# jq is used to assist with Jason parsing. we could do away with it if it becomes a burdon
+REQUIRE_bin "jq"
 
+
+############
+#  Test Config to make sure we have everything we need
+############
 HowToGetAPIkey() {
     cat <<-EOF
 	Here is how to get your API key:
 	
-	    Go to your account page.
+	    Go to your account page by....
+	      * login
+	      * click on down arrow next to "me" top right of page
+	      * click on account settings
+	      * at the bottom of the preferences tab
 	    Click on the "Generate" button under the Releases API Key.
 	    Copy and paste the key that appears into 
-	        ~/.lsmb-release
+	        $ConfigFile
 	            [sourceforge]
 	            ApiKey    = YourKey
 	
 EOF
-    GetKey 'yN' 'Continue with remaining tasks? '
-    echo $Key asdf asdf asdf
-    if TestKey "Y"; then : ; else exit 1; fi
 }
+
+    while true; do
+        # test for the apikey first so we can display help on getting it.
+        if ( [[ ! -v cfgValue[sourceforge_ApiKey] ]] || [[ -z "${cfgValue[sourceforge_ApiKey]}" ]] ); then HowToGetAPIkey; fi #return; fi
+        TestConfigInit;
+        TestConfig4Key 'sourceforge' 'Project'             'ledgersmb'
+        TestConfig4Key 'sourceforge' 'ReadlineHistory'     '/tmp/sourceforge.history'
+        TestConfig4Key 'sourceforge' 'ApiKey'              'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+        TestConfig4Key 'sourceforge' 'DefaultFileTemplate' 'Releases/${Version_Stable}/ledgersmb-${Version_Stable}.tar.gz'
+        TestConfig4Key 'sourceforge' 'download_label'      'Download Latest ($Version_Stable)'
+        TestConfig4Key 'sourceforge' 'OS_List'             'windows mac linux bsd solaris others'
+        if TestConfigAsk "Sourceforge Default Link Update"; then break; fi
+    done
+
+
+getCurrentProjectInfo() { # Stores result in Project_JSON   stores release.filename in Project_Filename    stores release.sf_platform_default in Project_OS_list
+    # {"release": null, "platform_releases": {"windows": null, "mac": null, "linux": null}}
+    local _URL="http://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/best_release.json"
+    declare -g Project_JSON=''
+    declare -g Project_Filename=''
+    printf "===================================================\n"
+    printf "===================================================\n"
+    printf "====   Retrieving Default Link for Project     ====\n"
+    printf "====     %-35s   ====\n" "${cfgValue[sourceforge_Project]}"
+    printf "===================================================\n"
+    printf "===================================================\n\n"
+    Project_JSON=`curl -s -X GET "$_URL"`
+    ${DEBUG:-false} && {
+        echo "\n==================================================="
+        echo "==================================================="
+        echo "==== Debug Output from getCurrentProjectInfo() ===="
+        echo "==================================================="
+        echo "==================================================="
+        jq . <<< "$Project_JSON"
+        echo
+    }
+
+    Project_Filename=`jq -c .release.filename <<< "$Project_JSON"`
+    Project_OS_list=`jq -c .release.sf_platform_default <<< "$Project_JSON"`
+    printf "filename ='%s'\n" "$Project_Filename"
+    printf "OS list  ='%s'\n" "$Project_OS_list"
+    echo
+}
+
 
 #### "${cfgValue[_]}"
 updateSourceforge() { # $1 = New Version     $2 = New Date
     #https://sourceforge.net/p/forge/community-docs/Using%20the%20Release%20API/
     #https://sourceforge.net/p/forge/documentation/Allura%20API/
-    if ( [[ ! -v cfgValue[sourceforge_ApiKey] ]] || [[ -z "${cfgValue[sourceforge_ApiKey]}" ]] ); then HowToGetAPIkey; fi #return; fi
-#    if [[ ! -v cfgValue[zsourceforge_ApiKey] ]]; then HowToGetAPIkey; fi
-#    if [[ -z "${cfgValue[sourceforge_ApiKey]}" ]]; then HowToGetAPIkey; fi
-    echo "key entry='${cfgValue[sourceforge_ApiKey]}'"
-echo done; return
-    curl -H "Accept: application/json" -X PUT \
-        -d "default=windows&default=mac&default=linux&default=bsd&default=solaris&default=others" \
-        -d "api_key=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" \
-        https://sourceforge.net/projects/[PROJECT NAME]/files/[FILE PATH]
+    
+    local _DefaultFile="$(envsubst '$Version_Stable' <<<${cfgValue[sourceforge_DefaultFileTemplate]})"
+    local _OS_List='';
+    declare -g Request_JSON=''
+    declare -g Request_Filename=''
+    declare -g Request_OS_list=''
+
+    for i in ${cfgValue[sourceforge_OS_List]}; do
+        _OS_List="${_OS_List:+${_OS_List}&}default=${i}";
+    done
 
 
-
-    # wikipedia-update.pl [boilerplate|Wikipage] [stable|preview] [NewVersion] [NewDate] [UserName Password]
-    release-wikipedia.pl "${cfgValue[wiki_PageToEdit]}" "stable" "$1" "$2" "${cfgValue[wiki_User]}" "${cfgValue[wiki_Password]}"
+#echo done; return
+    printf "===================================================\n"
+    printf "===================================================\n"
+    printf "====   Updating Sourceforge Default link       ====\n"
+    printf "====   for project %-25s   ====\n" "${cfgValue[sourceforge_Project]}"
+    printf "===================================================\n"
+    printf "===================================================\n\n"
+    Request_JSON=`curl -s -H "Accept: application/json" -X PUT \
+        -d "$_OS_List" \
+        -d "api_key=${cfgValue[sourceforge_ApiKey]}" \
+        "https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"`
+    ${DEBUG:-false} && {
+        echo "\n==================================================="
+        echo "==================================================="
+        echo "====   Debug Output from updateSourceforge()   ===="
+        echo "==================================================="
+        echo "==================================================="
+        jq . <<< "$Request_JSON"
+        echo
+    }
+    Request_Filename=`jq -c .result.name <<< "$Request_JSON"`
+    Request_OS_list=`jq -c .result.x_sf.default <<< "$Request_JSON"`
+    printf "filename ='%s'\n" "$Request_Filename"
+    printf "OS list  ='%s'\n" "$Request_OS_list"
+    echo
 }
 
 
 
 RunAllUpdates() {
-    updateSourceforge "$release_version" "$release_date";
+    getCurrentProjectInfo;
+    updateSourceforge "$release_version";
 }
 
-RunAllUpdates
-echo Continuing....
-exit
+
 main() {
+    clear;
         cat <<-EOF
 	     _________________________________________________
 	    /________________________________________________/|
 	    |                                               | |
-	    |  Ready to send some updates out to the world  | |
-	    |                                               | |
-	    |   *  Update Version on Wikipedia (en)         | |
-	    |   *  Send Release Emails to                   | |
-	    |           *  $(printf "%-33s" "${cfgValue[mail_AnnounceList]}";)| |
-	    |           *  $(printf "%-33s" "${cfgValue[mail_UsersList]}";)| |
-	    |           *  $(printf "%-33s" "${cfgValue[mail_DevelList]}";)| |
-	    |                                               | |
-	    |   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    | |
-	    |      The following are not yet complete       | |
-	    |                                               | |
-	    |   *  Update version on Wikipedia (es)         | |
-	    |        https://es.wikipedia.org/w/index.php?title=LedgerSMB&action=edit
-	    |   *  Post to $(printf "%-33s" "${cfgValue[drupal_URL]}";)| |
-	    |      Don't forget to use the 'release'        | |
-	    |      content type, and set the correct branch | |
-	    |      to '$branch'                             | |
-	    |        http://ledgersmb.org/node/add/release  | |
-	    |   *  Update IRC Title                         | |
-	    |   *  Update Sourceforge Download Link         | |
-	    |                                               | |
-	    |   * Publish a release on GitHub               | |
-	    |         by converting the tag                 | |
+	    |  Ready update the Sourceforge default link    | |
+	    |      for project                              | |
+	    |           *  $(printf "%-33s" "${cfgValue[sourceforge_Project]}";)| |
 	    |                                               | |
 	    |_______________________________________________|/
 
 
 	EOF
 
-    GetKey 'Yn' "Continue and send Updates to the world";
+    GetKey 'Yn' "Continue and Update Sourceforge Default Link?";
     if TestKey "Y"; then RunAllUpdates $Version $Date; fi
 
     echo
@@ -112,39 +195,3 @@ main() {
 main;
 
 exit;
-
-
-#### everything below here is just notes. it can be removed without problems
-+++++++++++++++++++++++++++++++++++
-++++        cfgValue[@]        ++++
-+++++++++++++++++++++++++++++++++++
-key: drupal_Password     = 
-key: drupal_URL          = www.ledgersmb.org
-key: drupal_User         = *****
-key: mail_FromAddress    = *******@******
-key: mail_AnnounceList   = ledger-smb-announce@lists.sourceforge.net
-key: mail_UsersList      = ledger-smb-users@lists.sourceforge.net
-key: mail_DevelList      = ledger-smb-devel@lists.sourceforge.net
-key: mail_Password       = testPW
-key: wiki_PageToEdit     = User:Sbts.david/sandbox
-key: wiki_Password       =
-key: wiki_User           = ledgersmb_bot
-+++++++++++++++++++++++++++++++++++
-
-
-
-dcg_> ehuelsmann: so that is the link that you want the script to update? Do you have a procedure you follow to.update.it manually
-<ehuelsmann> yes.
-<ehuelsmann> if you go to the file/directory to be marked,
-<ehuelsmann> then click on the (i) icon
-<ehuelsmann> hmm. that's an i
-<ehuelsmann> you'll see a list of platforms
-<ehuelsmann> each of those platforms can be checked independently.
-<ehuelsmann> because we don't distribute binaries, I check them all for the same directory.
-<ehuelsmann> then, in 2 minutes or so,
-<ehuelsmann> the link on the pages updates.
-<ehuelsmann> is that what you wanted to know?
-<ehuelsmann> oh. you need to confirm with "ok", I think.
-<ehuelsmann> "Save" to be exact
-<dcg_> Yep thanks. If I know the manual process I can validate the automation a bit easier
-

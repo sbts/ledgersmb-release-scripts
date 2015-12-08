@@ -17,8 +17,15 @@ User         = foobar
 Password     =
 
 [sourceforge]
-Project      = ledgersmb
-ApiKey       = 
+ApiKey              = 
+Project             = ledger-smb
+ReadlineHistory     = /tmp/sourceforge.history
+DefaultFileTemplate = Releases/${Version_Stable}/ledgersmb-${Version_Stable}.tar.gz
+download_label      = Download Latest ($Version_Stable)
+                    # As of 9th december 2015 these OS types are available
+                    # windows mac linux android bsd solaris others
+OS_List             = windows mac linux android bsd solaris others
+
 
 [irc]
 Server              = chat.freenode.net

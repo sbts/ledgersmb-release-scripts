@@ -251,17 +251,6 @@ QUIT() {
     printf "<>QUIT\n" | tee -a "$Log";
 }
 
-EnableHistory() { # Requires $1 to be a history filename
-    HISTFILE="$1"
-    shopt -s histappend
-    set -o history
-}
-
-AddHistory() { # requires $1 to be line to add to history
-        history -s "$@"; # store in history array
-        history -a; #history -n; # append to history file, then reread any new entries # the reread may not be required.
-}
-
 TALK() {
     local _RequiresNick='WHO';
     local _RequiresChannel='TOPIC';

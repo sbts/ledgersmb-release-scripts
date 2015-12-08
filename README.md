@@ -39,6 +39,10 @@ release-notifications.sh
 bash-functions.sh
 ============================
     A library of functions that are common to most of the scripts
+    One Environment Variable MUST be set before sourcing this file.
+    eg:
+        ConfigFile=~/.lsmb-release
+    This can be set to any location/file you want as long as it is readable by the library.
 
 
 ============================

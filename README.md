@@ -9,11 +9,17 @@ Tools to assist LedgerSMB developers release a new version
 For more information about any of these files, Read The Source Luke
 
 ============================
-_lsmb-release.sample
+.lsmb-release.sample
 ============================
     Sample config file.
     You WILL need to edit it for your environment
     Should be renamed to ~/.lsmb-release.sh
+    
+    The config file is in inifile format with [sections] and key = value pairs.
+    eg:
+        [irc]
+        Server = chat.freenode.net
+        Port   = 6667
 
 
 ============================

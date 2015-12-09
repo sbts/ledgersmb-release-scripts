@@ -3,6 +3,7 @@
 #### http://search.cpan.org/~exobuzz/MediaWiki-API-0.41/lib/MediaWiki/API.pm
 use MediaWiki::API;
 use strict;
+use warnings;
 
   my $mw = MediaWiki::API->new();
   $mw->{config}->{api_url} = 'http://en.wikipedia.org/w/api.php';
@@ -156,11 +157,11 @@ sub editpage {
     }
     if ( $mw->{config}->{api_url} =~ /en.wiki/ ) { # english regex
         if ( $editStable eq "stable" ) {
-            $text =~ s/(latest release version) = .*\n/\1 = $newversion \n/m;
-            $text =~ s/(latest release date) = .*\n/\1 = $newdate \n/m;
+            $text =~ s/(latest release version) = .*\n/$1 = $newversion \n/m;
+            $text =~ s/(latest release date) = .*\n/$1 = $newdate \n/m;
         } elsif ( $editStable eq "preview" ) {
-            $text =~ s/(latest preview version) = .*\n/\1 = $newversion \n/m;
-            $text =~ s/(latest preview date) = .*\n/\1 = $newdate \n/m;
+            $text =~ s/(latest preview version) = .*\n/$1 = $newversion \n/m;
+            $text =~ s/(latest preview date) = .*\n/$1 = $newdate \n/m;
         } else {
             die "editpage():  Nothing to edit.";
         }
@@ -168,11 +169,11 @@ sub editpage {
         if ( $editStable eq "stable" ) {
 #            $text =~ s/última_versión\s*= .*\n/última_versión              = $newversion \n/m;
 #            $text =~ s/fecha_última_versión\s*= .*\n/fecha_última_versión        = $newdate \n/m;
-            $text =~ s/(.ltima_versi.n)\s*= .*\n/\1              = $newversion \n/m;
-            $text =~ s/(fecha_.ltima_versi.n)\s*= .*\n/\1        = $newdate \n/m;
+            $text =~ s/(.ltima_versi.n)\s*= .*\n/$1              = $newversion \n/m;
+            $text =~ s/(fecha_.ltima_versi.n)\s*= .*\n$\1        = $newdate \n/m;
         } elsif ( $editStable eq "preview" ) {
-            $text =~ s/(.ltima_versi.n_prueba)\s*= .*\n/\1      = $newversion \n/m;
-            $text =~ s/(fecha_.ltima_versi.n_prueba)\s*= .*\n/\1         = $newdate \n/m;
+            $text =~ s/(.ltima_versi.n_prueba)\s*= .*\n/$1      = $newversion \n/m;
+            $text =~ s/(fecha_.ltima_versi.n_prueba)\s*= .*\n/$1         = $newdate \n/m;
         } else {
             die "editpage():  Nothing to edit.";
         }

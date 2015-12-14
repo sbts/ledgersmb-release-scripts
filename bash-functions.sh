@@ -106,6 +106,11 @@ TestKey() {
 ############
 #  Misc functions
 ############
+
+    SetTerminalTitle() {
+        echo -en "\033]0;${1:-No Title Supplied}\a"
+    }
+
     safe_source() { # $1 is filename to include
         libFile=` readlink -f $1`
         [[ -f $libFile ]] && { [[ -r $libFile ]] && source $libFile; } || {

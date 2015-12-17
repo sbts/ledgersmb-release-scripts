@@ -32,6 +32,18 @@ shopt -s extglob;
 ############
 
 ############
+# example use of whiptail
+############
+whiptail_example() {
+    clear; 
+    SECONDS=0; 
+    while (( SECONDS < 10 )); do 
+        echo $(( 10 * SECONDS )); 
+    done | whiptail --title "Sample Fuel Gauge" --backtitle "" --gauge "fuel" 0 30 50 --topleft;
+    whiptail --title title --backtitle "" --msgbox "some info" 0 30;
+}
+
+############
 #  GetKey, GetKey2, and Test Key functions for handling user input
 ############
 declare -a -r MenuKeys_1=({{0..9},{a..z}});

@@ -13,7 +13,7 @@ For more information about any of these files, Read The Source Luke
 ============================
     Sample config file.
     You WILL need to edit it for your environment
-    Should be renamed to ~/.lsmb-release.sh
+    Should be renamed to ~/.lsmb-release
     
     The config file is in inifile format with [sections] and key = value pairs.
     eg:

@@ -111,15 +111,15 @@ sendEmail() {
 #### "${cfgValue[_]}"
 updateWikipedia() { # $1 = New Version     $2 = New Date
     # wikipedia-update.pl [boilerplate|Wikipage] [stable|preview] [NewVersion] [NewDate] [UserName Password]
-    release-wikipedia.pl "${cfgValue[wiki_PageToEdit]}" "$release_type" "$1" "$2" "${cfgValue[wiki_User]}" "${cfgValue[wiki_Password]}"
+    ./release-wikipedia.pl "${cfgValue[wiki_PageToEdit]}" "$release_type" "$1" "$2" "${cfgValue[wiki_User]}" "${cfgValue[wiki_Password]}"
 }
 
 updateIRC() {
-    release-irc.sh $release_type $release_version
+    ./release-irc.sh $release_type $release_version
 }
 
 updateSourceforge() {  # note release-sourceforge.sh silently exits if $release_type != stable .   Anything else doesn't make sense.
-    release-sourceforge.sh "$release_type" "$release_version"
+    ./release-sourceforge.sh "$release_type" "$release_version"
 }
 
 RunAllUpdates() {

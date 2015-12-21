@@ -145,7 +145,7 @@ ValidateEnvironment() {
             TestConfig4Key 'mail'   'UsersList'     'ledger-smb-users@lists.sourceforge.net'
             TestConfig4Key 'mail'   'DevelList'     'ledger-smb-devel@lists.sourceforge.net'
             TestConfig4Key 'mail'   'FromAddress'   'release@ledgersmb.org'
-            TestConfig4Key 'mail'   'Password'      ''
+#            TestConfig4Key 'mail'   'Password'      ''
             TestConfig4Key 'mail'   'MTAbinary'     'ssmtp'
             if TestConfigAsk "Send List Mail"; then break; fi
         done

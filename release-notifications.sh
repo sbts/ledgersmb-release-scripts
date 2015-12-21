@@ -123,9 +123,11 @@ updateSourceforge() {  # note release-sourceforge.sh silently exits if $release_
 }
 
 RunAllUpdates() {
-    updateWikipedia "$release_version" "$release_date";
-    updateIRC;
-    updateSourceforge;
+    if ! [[ "$release_type" == "old" ]]; then
+        updateWikipedia "$release_version" "$release_date";
+        updateIRC;
+        updateSourceforge;
+    fi
     sendEmail;
 }
 

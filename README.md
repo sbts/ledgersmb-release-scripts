@@ -32,7 +32,11 @@ release-notifications.sh
         * $release_type
         * $release_branch
 
-        $release_type MUST have a value of either "stable" or "preview" or "both"
+        $release_type MUST have a value of "old" or "stable" or "preview" or "both"
+          * old     - Only sends Release Emails
+          * stable  - Updates Stable Release information
+          * preview - Updates Preview Release information
+          * both    - Updates Stable and Preview Release information
 
 
 ============================

@@ -42,6 +42,8 @@ getChangelogEntry() {
 
 
 createEmail() {
+    prj_url_dir='Releases'
+    if [[ $release_type == preview ]]; then prj_url_dir='Beta%20Releases'; fi
     #HTML email is possible. Just add these lines after the subject:
     #Mime-Version: 1.0
     #Content-type: text/html; charset=”iso-8859-1″

@@ -84,6 +84,7 @@ sendEmail() {
     Sender=${EMAIL};
     [[ -n $EMAIL ]] && scrape_config_files_for_Sender;
 
+    MTA="${cfgValue[mail_MTAbinary]}";
     [[ -z $MTA ]] && MTA=`which ssmtp`;
     [[ -z $MTA ]] && MTA=`which sendmail`;
     [[ -x `which $MTA` ]] || { echo "Exiting: No Known MTA"; exit 1; }

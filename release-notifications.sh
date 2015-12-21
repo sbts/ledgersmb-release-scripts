@@ -97,15 +97,15 @@ sendEmail() {
 #    echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
 #return;
     if createEmail "${cfgValue[mail_AnnounceList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < msg.txt
+        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
     fi
 
     if createEmail "${cfgValue[mail_UsersList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < msg.txt
+        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
     fi
 
     if createEmail "${cfgValue[mail_DevelList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < msg.txt
+        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
     fi
 }
 

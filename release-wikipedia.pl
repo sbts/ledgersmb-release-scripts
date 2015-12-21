@@ -146,8 +146,8 @@ sub editpage {
     my $editStable = shift;
     my $newversion = shift;
     my $newdate = shift;
-    $newversion =~ s/[^\w-.]//g;        # sanitize by stripping chars that are not whitelisted
-    $newdate =~ s/[^\d-]//g;            # sanitize by stripping chars that are not whitelisted
+    $newversion =~ s/[^\w\-\.]//g;        # sanitize by stripping chars that are not whitelisted
+    $newdate =~ s/[^\d\-]//g;            # sanitize by stripping chars that are not whitelisted
 
     my $ref = $mw->get_page( { title => $pagename } );
     my $text = $ref->{'*'};
@@ -169,8 +169,8 @@ sub editpage {
         if ( $editStable eq "stable" ) {
 #            $text =~ s/última_versión\s*= .*\n/última_versión              = $newversion \n/m;
 #            $text =~ s/fecha_última_versión\s*= .*\n/fecha_última_versión        = $newdate \n/m;
-            $text =~ s/(.ltima_versi.n)\s*= .*\n/$1              = $newversion \n/m;
-            $text =~ s/(fecha_.ltima_versi.n)\s*= .*\n$\1        = $newdate \n/m;
+            $text =~ s/(.ltima_versi.n)\s*= .*$/$1              = $newversion \n/m;
+            $text =~ s/(fecha_.ltima_versi.n)\s*= .*\n/$1        = $newdate \n/m;
         } elsif ( $editStable eq "preview" ) {
             $text =~ s/(.ltima_versi.n_prueba)\s*= .*\n/$1      = $newversion \n/m;
             $text =~ s/(fecha_.ltima_versi.n_prueba)\s*= .*\n/$1         = $newdate \n/m;

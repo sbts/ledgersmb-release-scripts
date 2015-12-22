@@ -53,16 +53,22 @@ sendEmail() {
     [[ -z $MTA ]] && MTA=`which sendmail`;
     [[ -x `which $MTA` ]] || { echo "Exiting: No Known MTA"; exit 1; }
 
+    local defaultRecipient="${cfgValue[mail_FromAddress]}"
+
+    if [[ $MTA =~ ssmtp ]] && [[ $MTA =~ '-t' ]]; then # ssmtp can't handle a commandline recipient if -t is used
+        unset defaultRecipient;
+    fi
+
     if createEmail "${cfgValue[mail_AnnounceList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
+        $MTA "$defaultRecipient" < /tmp/msg.txt
     fi
 
     if createEmail "${cfgValue[mail_UsersList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
+        $MTA "$defaultRecipient" < /tmp/msg.txt
     fi
 
     if createEmail "${cfgValue[mail_DevelList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
+        $MTA "$defaultRecipient" < /tmp/msg.txt
     fi
 }
 

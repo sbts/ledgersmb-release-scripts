@@ -1,10 +1,6 @@
 #!/bin/bash
 
-#ehuelsmann: did you have a chance to look at the printer config demo?
-#http://tombuntu.com/index.php/2008/10/21/sending-email-from-your-system-with-ssmtp/
-
 # import some functions that we need, like reading values from our config file.
-#[ -f release-lib.sh ] && . release-lib.sh;
 
 ConfigFile=~/.lsmb-release
 
@@ -50,7 +46,7 @@ RunAllUpdates() {
 
 ValidateEnvironment() {
     ############
-    #  Select an editor. (function is in bash-lib.sh
+    #  Select an editor. (function is in bash-functions.sh)
     ############
         SelectEditor;
 
@@ -63,7 +59,6 @@ ValidateEnvironment() {
             TestConfig4Key 'mail'   'UsersList'     'ledger-smb-users@lists.sourceforge.net'
             TestConfig4Key 'mail'   'DevelList'     'ledger-smb-devel@lists.sourceforge.net'
             TestConfig4Key 'mail'   'FromAddress'   'release@ledgersmb.org'
-#            TestConfig4Key 'mail'   'Password'      ''
             TestConfig4Key 'mail'   'MTAbinary'     'ssmtp'
             if TestConfigAsk "Send List Mail"; then break; fi
         done

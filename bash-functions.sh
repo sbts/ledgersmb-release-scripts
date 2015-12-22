@@ -143,6 +143,7 @@ TestKey() {
     }
 
     REQUIRE_bin() { # space or arg separated list of executables that are required
+                    # if $MSG is set, print it, then unset MSG
         local result=true;
         for i in $@; do
             echo -n "testing '$i' : "
@@ -150,6 +151,7 @@ TestKey() {
         done
         $result || {
             echo "Can't run $0 because you are missing required executables."
+            [[ -n MSG ]] && echo "$MSG" && unset MSG;
             echo "Exiting Now...."
             exit 1;
         }

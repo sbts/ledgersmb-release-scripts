@@ -100,6 +100,8 @@ ValidateEnvironment() {
         [[ -z $release_date    ]] && { _envGOOD=false; echo "release_date is unavailable"; }
         [[ -z $release_type    ]] && { _envGOOD=false; echo "release_type is unavailable"; } # one of stable | preview
         [[ -z $release_branch  ]] && { _envGOOD=false; echo "release_branch is unavailable"; } # describes the ????
+        [[ -z $release_changelog  ]] && { _envGOOD=false; echo "release_changelog is unavailable"; }
+        [[ -z $release_sha256sums ]] && { _envGOOD=false; echo "release_sha256sums is unavailable"; }
         $_envGOOD || exit 1;
 }
 

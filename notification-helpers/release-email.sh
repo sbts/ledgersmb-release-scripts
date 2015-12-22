@@ -30,13 +30,13 @@ createEmail() {
 	version of its open source ERP and accounting application. This release
 	contains the following fixes and improvements:
 	
-	$extracted_changelog
+	$release_changelog
 	
 	The release can be downloaded from sourceforge at
 	  https://sourceforge.net/projects/ledger-smb/files/$prj_url_dir/$release_version/
 	
 	These are the sha256 checksums of the uploaded files:
-	$extracted_sha256sums
+	$release_sha256sums
 	
 EOF
     $Editor /tmp/msg.txt
@@ -100,10 +100,12 @@ ValidateEnvironment() {
     #  Test Environment to make sure we have everything we need
     ############
         local _envGOOD=true;
-        [[ -z $release_version ]] && { _envGOOD=false; echo "release_version is unavailable"; }
-        [[ -z $release_date    ]] && { _envGOOD=false; echo "release_date is unavailable"; }
-        [[ -z $release_type    ]] && { _envGOOD=false; echo "release_type is unavailable"; } # one of stable | preview
-        [[ -z $release_branch  ]] && { _envGOOD=false; echo "release_branch is unavailable"; } # describes the ????
+        [[ -z $release_version    ]] && { _envGOOD=false; echo "release_version is unavailable"; }
+        [[ -z $release_date       ]] && { _envGOOD=false; echo "release_date is unavailable"; }
+        [[ -z $release_type       ]] && { _envGOOD=false; echo "release_type is unavailable"; } # one of stable | preview
+        [[ -z $release_branch     ]] && { _envGOOD=false; echo "release_branch is unavailable"; } # describes the ????
+        [[ -z $release_changelog  ]] && { _envGOOD=false; echo "release_changelog is unavailable"; }
+        [[ -z $release_sha256sums ]] && { _envGOOD=false; echo "release_sha256sums is unavailable"; }
         $_envGOOD || exit 1;
 }
 

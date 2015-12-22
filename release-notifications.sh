@@ -31,11 +31,11 @@ updateWikipedia() { # $1 = New Version     $2 = New Date
 }
 
 updateIRC() {
-    ./release-irc.sh $release_type $release_version
+    ./notification-helpers/release-irc.sh $release_type $release_version
 }
 
 updateSourceforge() {  # note release-sourceforge.sh silently exits if $release_type != stable .   Anything else doesn't make sense.
-    ./release-sourceforge.sh "$release_type" "$release_version"
+    ./notification-helpers/release-sourceforge.sh "$release_type" "$release_version"
 }
 
 RunAllUpdates() {
@@ -44,7 +44,7 @@ RunAllUpdates() {
         updateIRC;
         updateSourceforge;
     fi
-    ./release-email.sh;
+    ./notification-helpers/release-email.sh;
 }
 
 

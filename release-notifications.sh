@@ -21,97 +21,10 @@ libFile=` readlink -f ./bash-functions.sh`
     exit 1;
 }
 
-#safe_source ./release-lib.sh
-
-x() {
-    cat <<EOF
-        <ehuelsmann> although, if you could automate:
-        <ehuelsmann> 1. update wikipedia entries        DONE
-        <ehuelsmann> 2. update IRC title                DONE
-        <ehuelsmann> 3. post to ledgersmb.org
-        <ehuelsmann> 4. update the SF download link     In Progress
-        <ehuelsmann> and 5. Post to the mailing lists   DONE
-        <ehuelsmann> then you're my man! :-)
-EOF
-}
-
-
 getChangelogEntry() {
     :
 }
 
-
-createEmail() {
-    prj_url_dir='Releases'
-    if [[ $release_type == preview ]]; then prj_url_dir='Beta%20Releases'; fi
-    #HTML email is possible. Just add these lines after the subject:
-    #Mime-Version: 1.0
-    #Content-type: text/html; charset=”iso-8859-1″
-    cat <<-EOF >/tmp/msg.txt
-	To: $1
-	From: ${cfgValue[mail_FromAddress]}
-	Subject: LedgerSMB $release_version released
-	
-	The LedgerSMB development team is happy to announce yet another new
-	version of its open source ERP and accounting application. This release
-	contains the following fixes and improvements:
-	
-	$extracted_changelog
-	
-	The release can be downloaded from sourceforge at
-	  https://sourceforge.net/projects/ledger-smb/files/$prj_url_dir/$release_version/
-	
-	These are the sha256 checksums of the uploaded files:
-	$extracted_sha256sums
-	
-EOF
-    $Editor /tmp/msg.txt
-    GetKey "Yn" "Send email Now? "
-    if TestKey "y"; then return `true`; else return `false`; fi
-}
-
-SelectEditor() {
-    [[ -z $Editor ]] && Editor=`which $EDITOR`
-    [[ -z $Editor ]] && Editor=`which $VISUAL`
-    [[ -z $Editor ]] && Editor=`which mcedit`
-    [[ -z $Editor ]] && Editor=`which nano`
-    [[ -z $Editor ]] && Editor=`which pico`
-    [[ -z $Editor ]] && Editor=`which vi`
-    [[ -z $Editor ]] && Editor=`which less`
-    [[ -z $Editor ]] && Editor="$(which more); read -n -p'Press Enter to Continue';"
-    [[ -z $Editor ]] && Editor="$(which cat); read -n -p'Press Enter to Continue';"
-}
-
-sendEmail() {
-    Sender=${EMAIL};
-    [[ -n $EMAIL ]] && scrape_config_files_for_Sender;
-
-    MTA="${cfgValue[mail_MTAbinary]}";
-    [[ -z $MTA ]] && MTA=`which ssmtp`;
-    [[ -z $MTA ]] && MTA=`which sendmail`;
-    [[ -x `which $MTA` ]] || { echo "Exiting: No Known MTA"; exit 1; }
-#    echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-#    echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-#    echo '%%                                     %%';
-#    echo '%%  No Email Sent.Function incomplete  %%';
-#    echo '%%                                     %%';
-#    echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-#    echo '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%';
-#return;
-    if createEmail "${cfgValue[mail_AnnounceList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
-    fi
-
-    if createEmail "${cfgValue[mail_UsersList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
-    fi
-
-    if createEmail "${cfgValue[mail_DevelList]}"; then
-        $MTA "${cfgValue[mail_FromAddress]}" < /tmp/msg.txt
-    fi
-}
-
-#### "${cfgValue[_]}"
 updateWikipedia() { # $1 = New Version     $2 = New Date
     # wikipedia-update.pl [boilerplate|Wikipage] [stable|preview] [NewVersion] [NewDate] [UserName Password]
     ./release-wikipedia.pl "${cfgValue[wiki_PageToEdit]}" "$release_type" "$1" "$2" "${cfgValue[wiki_User]}" "${cfgValue[wiki_Password]}"
@@ -131,7 +44,7 @@ RunAllUpdates() {
         updateIRC;
         updateSourceforge;
     fi
-    sendEmail;
+    ./release-email.sh;
 }
 
 

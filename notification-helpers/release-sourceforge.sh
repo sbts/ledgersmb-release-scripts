@@ -49,7 +49,8 @@ libFile=` readlink -f ./bash-functions.sh`
     exit 1;
 }
 
-#REQUIRE_bin "envsubst"
+# envsubst lets us safely substitute envvars into strings that would other wise need eval running on them. it is part of gettext-base
+REQUIRE_bin "envsubst"
 # jq is used to assist with Jason parsing. we could do away with it if it becomes a burdon
 REQUIRE_bin "jq"
 

@@ -152,6 +152,8 @@ TestKey() {
         $result || {
             echo "Can't run $0 because you are missing required executables."
             [[ -n MSG ]] && echo "$MSG" && unset MSG;
+            unset Key;
+            while ! TestKey "y"; do GetKey " y" "Please install then press Y to continue"; done
             echo "Exiting Now...."
             exit 1;
         }

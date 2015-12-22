@@ -34,6 +34,10 @@ shopt -s extglob;
 ############
 # example use of whiptail
 ############
+whiptail_available() {
+    if [[ "`whiptail 2>&1`" =~ ^.*--msgbox ]]; then true; else false; fi
+}
+
 whiptail_example() {
     clear; 
     SECONDS=0; 

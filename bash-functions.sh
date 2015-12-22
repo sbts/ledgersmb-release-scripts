@@ -151,6 +151,18 @@ TestKey() {
         }
     }
 
+    SelectEditor() {
+        [[ -z $Editor ]] && Editor=`which $EDITOR`
+        [[ -z $Editor ]] && Editor=`which $VISUAL`
+        [[ -z $Editor ]] && Editor=`which mcedit`
+        [[ -z $Editor ]] && Editor=`which nano`
+        [[ -z $Editor ]] && Editor=`which pico`
+        [[ -z $Editor ]] && Editor=`which vi`
+        [[ -z $Editor ]] && Editor=`which less`
+        [[ -z $Editor ]] && Editor="$(which more); read -n -p'Press Enter to Continue';"
+        [[ -z $Editor ]] && Editor="$(which cat); read -n -p'Press Enter to Continue';"
+    }
+
 
 ############
 #  Config File functions

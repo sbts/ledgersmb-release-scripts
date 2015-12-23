@@ -4,7 +4,9 @@
 ConfigFile=~/.lsmb-release
 
 # set DEBUG=true to get dump of returned JSON for each command
-DEBUG=true;
+DEBUG=${cfgValue[sourceforge_Debug]};
+: ${DEBUG:+true};
+: ${DEBUG:=false};
 
 ############
 #  Check our arguments are sane
@@ -143,12 +145,17 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
         -d "api_key=${cfgValue[sourceforge_ApiKey]}" \
         "https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"`
     ${DEBUG:-false} && {
-        echo "\n==================================================="
+        echo "==================================================="
         echo "==================================================="
         echo "====   Debug Output from updateSourceforge()   ===="
         echo "==================================================="
         echo "==================================================="
         jq . <<< "$Request_JSON"
+        echo "---------------------------------------------------"
+        echo "api_key=${cfgValue[sourceforge_ApiKey]}"
+        echo "DefaultFileTemplate=${cfgValue[sourceforge_DefaultFileTemplate]}"
+        echo "URL=https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"
+        echo "---------------------------------------------------"
         echo
     }
     Request_Filename=`jq -c .result.name <<< "$Request_JSON"`
@@ -187,6 +194,7 @@ ValidateEnvironment() {
                 GetKey " " "Press any key to continue"
             fi
             TestConfig4Key 'sourceforge' 'Project'  'ledger-smb'
+            TestConfig4Key 'sourceforge' 'Debug'  '[true | false]'
             if TestConfigAsk "Sourceforge Default Download Update"; then break; fi
         done
 

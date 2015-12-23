@@ -6,8 +6,8 @@ ConfigFile=~/.lsmb-release
 ############
 #  Set internal variables so $1 and $2 are effectively available inside functions
 ############
-release_type="${1:-${release_type:-unknown}}"
-release_version="${2:-${release_version:-unknown}}"
+export release_type="${1:-${release_type:-unknown}}"
+export release_version="${2:-${release_version:-unknown}}"
 
 ############
 #  Check our arguments are sane
@@ -55,7 +55,6 @@ libFile=` readlink -f ./bash-functions.sh`
 DEBUG=${cfgValue[sourceforge_Debug]};
 : ${DEBUG:+true};
 : ${DEBUG:=false};
-
 
 ############
 #  Test Config to make sure we have everything we need

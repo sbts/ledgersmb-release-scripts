@@ -81,8 +81,12 @@ ValidateEnvironment() {
 
         while true; do
             TestConfigInit;
-            TestConfig4Key 'sourceforge' 'ApiKey'   ''
-            TestConfig4Key 'sourceforge' 'Project'  'ledger-smb'
+            TestConfig4Key 'sourceforge' 'Project'             'ledgersmb'
+            TestConfig4Key 'sourceforge' 'ReadlineHistory'     '/tmp/sourceforge.history'
+            TestConfig4Key 'sourceforge' 'ApiKey'              'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+            TestConfig4Key 'sourceforge' 'DefaultFileTemplate' 'Releases/${release_version}/ledgersmb-${release_version}.tar.gz'
+            TestConfig4Key 'sourceforge' 'download_label'      'Download Latest ($release_version)'
+            TestConfig4Key 'sourceforge' 'OS_List'             'windows mac linux bsd solaris others'
             if TestConfigAsk "Sourceforge Default Download Update"; then break; fi
         done
 

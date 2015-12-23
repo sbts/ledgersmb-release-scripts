@@ -4,9 +4,15 @@
 ConfigFile=~/.lsmb-release
 
 ############
+#  Set internal variables so $1 and $2 are effectively available inside functions
+############
+release_type="${1:-${release_type:-unknown}}"
+release_version="${2:-${release_version:-unknown}}"
+
+############
 #  Check our arguments are sane
 ############
-    if ! [[ ${1:-unknown} == 'stable' ]]; then
+    if ! [[ ${release_type} == 'stable' ]]; then
         printf "\n\n\n";
         printf "=====================================================================\n";
         printf "=====================================================================\n";
@@ -18,7 +24,7 @@ ConfigFile=~/.lsmb-release
         printf "Exiting Now....\n\n\n";
         exit 1;
     fi
-    if [[ -z $2 ]] && [[ -z $release_version ]]; then
+    if [[ -z $release_version ]]; then
         printf "\n\n\n";
         printf "=====================================================================\n";
         printf "=====================================================================\n";
@@ -31,7 +37,6 @@ ConfigFile=~/.lsmb-release
         printf "Exiting Now....\n\n\n";
         exit 1;
     fi
-
 
 libFile=` readlink -f ./bash-functions.sh`
 [[ -f $libFile ]] && { [[ -r $libFile ]] && source $libFile; } || {
@@ -80,8 +85,8 @@ EOF
         TestConfig4Key 'sourceforge' 'Project'             'ledgersmb'
         TestConfig4Key 'sourceforge' 'ReadlineHistory'     '/tmp/sourceforge.history'
         TestConfig4Key 'sourceforge' 'ApiKey'              'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-        TestConfig4Key 'sourceforge' 'DefaultFileTemplate' 'Releases/${Version_Stable}/ledgersmb-${Version_Stable}.tar.gz'
-        TestConfig4Key 'sourceforge' 'download_label'      'Download Latest ($Version_Stable)'
+        TestConfig4Key 'sourceforge' 'DefaultFileTemplate' 'Releases/${release_version}/ledgersmb-${release_version}.tar.gz'
+        TestConfig4Key 'sourceforge' 'download_label'      'Download Latest ($release_version)'
         TestConfig4Key 'sourceforge' 'OS_List'             'windows mac linux bsd solaris others'
         if TestConfigAsk "Sourceforge Default Link Update"; then break; fi
     done
@@ -122,7 +127,7 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
     #https://sourceforge.net/p/forge/community-docs/Using%20the%20Release%20API/
     #https://sourceforge.net/p/forge/documentation/Allura%20API/
     
-    local _DefaultFile="$(envsubst '$Version_Stable' <<<${cfgValue[sourceforge_DefaultFileTemplate]})"
+    local _DefaultFile="$(envsubst '$release_version' <<<${cfgValue[sourceforge_DefaultFileTemplate]})"
     local _OS_List='';
     declare -g Request_JSON=''
     declare -g Request_Filename=''

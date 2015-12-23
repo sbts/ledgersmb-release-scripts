@@ -49,11 +49,6 @@ libFile=` readlink -f ./bash-functions.sh`
     exit 1;
 }
 
-# envsubst lets us safely substitute envvars into strings that would other wise need eval running on them. it is part of gettext-base
-REQUIRE_bin "envsubst"
-# jq is used to assist with Jason parsing. we could do away with it if it becomes a burdon
-REQUIRE_bin "jq"
-
 
 ############
 #  Test Config to make sure we have everything we need
@@ -168,6 +163,42 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
 RunAllUpdates() {
     getCurrentProjectInfo;
     updateSourceforge "$release_version";
+}
+
+ValidateEnvironment() {
+    ############
+    #  Require some binaries
+    ############
+        # envsubst lets us safely substitute envvars into strings that would other wise need eval running on them. it is part of gettext-base
+        MSG="install with\n\tapt-get install gettext-base" REQUIRE_bin "envsubst"
+        # jq is used to assist with Jason parsing. we could do away with it if it becomes a burdon
+        MSG="install with\n\tapt-get install jq" REQUIRE_bin "jq"
+
+    ############
+    #  Test Config to make sure we have everything we need
+    ############
+        while true; do
+            TestConfigInit;
+            TestConfig4Key 'sourceforge' 'ApiKey'   'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+            if ! [[ "${cfgValue[sourceforge_ApiKey]}" =~ ^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$ ]]; then
+                printf "%% your ApiKey looks like it could be invalid %%\n"
+                printf "%%     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx   %%\n"
+                printf "%%     %36s   %%\n" "${cfgValue[sourceforge_ApiKey]}"
+                GetKey " " "Press any key to continue"
+            fi
+            TestConfig4Key 'sourceforge' 'Project'  'ledger-smb'
+            if TestConfigAsk "Sourceforge Default Download Update"; then break; fi
+        done
+
+    ############
+    #  Test Environment to make sure we have everything we need
+    ############
+        local _envGOOD=true;
+        [[ -z $release_version ]] && { _envGOOD=false; echo "release_version is unavailable"; }
+#        [[ -z $release_date    ]] && { _envGOOD=false; echo "release_date is unavailable"; }
+        [[ -z $release_type    ]] && { _envGOOD=false; echo "release_type is unavailable"; } # one of stable | preview
+#        [[ -z $release_branch  ]] && { _envGOOD=false; echo "release_branch is unavailable"; } # describes the ????
+        $_envGOOD || exit 1;
 }
 
 

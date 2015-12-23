@@ -30,13 +30,13 @@ createEmail() {
 	version of its open source ERP and accounting application. This release
 	contains the following fixes and improvements:
 	
-	$release_changelog
+	$extracted_changelog
 	
 	The release can be downloaded from sourceforge at
 	  https://sourceforge.net/projects/ledger-smb/files/$prj_url_dir/$release_version/
 	
 	These are the sha256 checksums of the uploaded files:
-	$release_sha256sums
+	$extracted_sha256sums
 	
 EOF
     $Editor /tmp/msg.txt

@@ -125,9 +125,10 @@ getCurrentProjectInfo() { # Stores result in Project_JSON   stores release.filen
 updateSourceforge() { # $1 = New Version     $2 = New Date
     #https://sourceforge.net/p/forge/community-docs/Using%20the%20Release%20API/
     #https://sourceforge.net/p/forge/documentation/Allura%20API/
-    
+
     local _DefaultFile="$(envsubst '$release_version' <<<${cfgValue[sourceforge_DefaultFileTemplate]})"
     local _OS_List='';
+    local _Download_Label="sf_download_label=\"$(envsubst '$release_version' <<<${cfgValue[sourceforge_download_label]})\""
     declare -g Request_JSON=''
     declare -g Request_Filename=''
     declare -g Request_OS_list=''
@@ -135,7 +136,6 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
     for i in ${cfgValue[sourceforge_OS_List]}; do
         _OS_List="${_OS_List:+${_OS_List}&}default=${i}";
     done
-
 
 #echo done; return
     printf "===================================================\n"
@@ -146,6 +146,7 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
     printf "===================================================\n\n"
     Request_JSON=`curl -s -H "Accept: application/json" -X PUT \
         -d "$_OS_List" \
+        -d "$_Download_Label" \
         -d "api_key=${cfgValue[sourceforge_ApiKey]}" \
         "https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"`
     ${DEBUG:-false} && {
@@ -156,9 +157,11 @@ updateSourceforge() { # $1 = New Version     $2 = New Date
         echo "==================================================="
         jq . <<< "$Request_JSON"
         echo "---------------------------------------------------"
-        echo "api_key=${cfgValue[sourceforge_ApiKey]}"
-        echo "DefaultFileTemplate=${cfgValue[sourceforge_DefaultFileTemplate]}"
-        echo "URL=https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"
+        echo "Download_Label      : $_Download_Label"
+        echo "OS_List             : $_OS_List"
+        echo "api_key             : ${cfgValue[sourceforge_ApiKey]}"
+        echo "DefaultFileTemplate : ${cfgValue[sourceforge_DefaultFileTemplate]}"
+        echo "URL                 : https://sourceforge.net/projects/${cfgValue[sourceforge_Project]}/files/$_DefaultFile"
         echo "---------------------------------------------------"
         echo
     }

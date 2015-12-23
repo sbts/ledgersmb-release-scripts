@@ -3,11 +3,6 @@
 # import some functions that we need, like reading values from our config file.
 ConfigFile=~/.lsmb-release
 
-# set DEBUG=true to get dump of returned JSON for each command
-DEBUG=${cfgValue[sourceforge_Debug]};
-: ${DEBUG:+true};
-: ${DEBUG:=false};
-
 ############
 #  Check our arguments are sane
 ############
@@ -50,6 +45,11 @@ libFile=` readlink -f ./bash-functions.sh`
     printf "Exiting Now....\n\n\n";
     exit 1;
 }
+
+# set DEBUG=true to get dump of returned JSON for each command
+DEBUG=${cfgValue[sourceforge_Debug]};
+: ${DEBUG:+true};
+: ${DEBUG:=false};
 
 
 ############
@@ -220,6 +220,7 @@ main() {
 	    |      for project                              | |
 	    |           *  $(printf "%-33s" "${cfgValue[sourceforge_Project]}";)| |
 	    |                                               | |
+	    |  DEBUG=$DEBUG                                   | |
 	    |_______________________________________________|/
 
 

@@ -47,3 +47,14 @@ bash-functions.sh
     eg:
         ConfigFile="$HOME/.lsmb-release"
     This can be set to any location/file you want as long as it is readable by the library.
+
+============================
+wc-pot-file
+============================
+    A script to generate some stats on our currently translateable strings.
+
+    usage:
+        wc-pot-file -h
+        wc-pot-file [-v] filename.pot
+        -h  : show this help
+        -v  : Verbose. Print word count and string for EVERY string
